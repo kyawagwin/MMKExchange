@@ -2,10 +2,17 @@ package com.passioncreativestudio.mmkexchange;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,27 +25,39 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private ProgressDialog progressDialog;
     private ListView rateListView;
-    private TextView textView;
+    private TextView rateDatetime;
 
     private DecimalFormat decimalFormat = new DecimalFormat("0.00");
-    private static String url = "http://mmk-exchange-kyawagwin.c9users.io/api/latest";
-    private static ArrayList<String> selectedCurrency = new ArrayList<>();
+    private static String url = "http://mmk-exchange.herokuapp.com/api/latest";
+    SimpleDateFormat rateDateFormat = new SimpleDateFormat("dd MMM yyyy hh:mm:ss a");
+    private HashMap<String, Currency> currenciesMap;
+    private ArrayList<String> selectedCurrencies;
+    private Date rateDate;
 
-
-    HashMap<String, Double> rateMap;
+    ArrayList<CurrencyRate> rateList;
     StringBuilder sb = new StringBuilder();
 
     @Override
@@ -57,14 +76,32 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        rateMap = new HashMap<>();
+        currenciesMap = Currency.initCurrencies();
+        selectedCurrencies = new ArrayList<>();
+
+        rateList = new ArrayList<>();
         rateListView = (ListView) findViewById(R.id.content_main_rateListView);
-        textView = (TextView) findViewById(R.id.content_main_textView);
+        rateDatetime = (TextView) findViewById(R.id.content_main_updatedDate);
 
-        selectedCurrency.add("MMK");
-        selectedCurrency.add("SGD");
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        new GetRates().execute();
+        for(Currency cur : currenciesMap.values()) {
+            if(prefs.getBoolean(cur.getName(), true)) {
+                selectedCurrencies.add(cur.getName());
+            }
+        }
+
+        if(isNetworkConnected()) {
+            new GetRates().execute();
+        } else {
+            Toast.makeText(this, "Please, check your internet connection!", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public boolean isNetworkConnected() {
+        final ConnectivityManager conMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        final NetworkInfo activeNetwork = conMgr.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.getState() == NetworkInfo.State.CONNECTED;
     }
 
     @Override
@@ -76,14 +113,21 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.action_refresh:
+                if(isNetworkConnected()) {
+                    new GetRates().execute();
+                } else {
+                    Toast.makeText(this, "Please, check your internet connection!", Toast.LENGTH_LONG).show();
+                }
+                return true;
+            default:
+                break;
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -107,20 +151,25 @@ public class MainActivity extends AppCompatActivity {
             String jsonStr = handler.makeServiceCall(url, "GET");
             if(jsonStr != null) {
                 try {
+                    rateList.clear();
+
                     Gson gson = new Gson();
                     Rate rate = gson.fromJson(jsonStr, Rate.class);
                     for (Field field : rate.getClass().getDeclaredFields()) {
                         field.setAccessible(true); // You might want to set modifier to public first.
-                        if(selectedCurrency.contains(field.getName())) {
+                        if(selectedCurrencies.contains(field.getName())) {
                             Double value = (Double) field.get(rate);
                             if (value != null) {
                                 sb.append(field.getName() + "=" + value);
 
-                                rateMap.put(field.getName(), value);
+                                rateList.add(new CurrencyRate(field.getName(), value));
                             }
+                        } else if(field.getName().equals("rateTimestamp")) {
+                            long rateTimestamp = (long) field.get(rate);
+                            rateDate = new Date(rateTimestamp * 1000);
+
                         }
                     }
-
                 } catch(Exception ex) {
                     Log.e(TAG, ex.getMessage());
                 }
@@ -137,31 +186,41 @@ public class MainActivity extends AppCompatActivity {
                 progressDialog.dismiss();
             }
 
-            textView.setText(sb.toString());
-            RatesAdapter adapter  = new RatesAdapter((Activity)MainActivity.this, rateMap);
+            if(rateList.size() == 0) {
+                Toast.makeText(MainActivity.this, "API Error!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            rateDatetime.setText(String.format("Updated On: %s", rateDateFormat.format(rateDate)));
+
+            RatesAdapter adapter  = new RatesAdapter(MainActivity.this, rateList);
             rateListView.setAdapter(adapter);
         }
     }
 
     private class RatesAdapter extends BaseAdapter {
         private LayoutInflater inflater;
-        private HashMap<String, Double> data = new HashMap<>();
-        private String[] keys;
+        private ArrayList<CurrencyRate> rates;
 
-        public RatesAdapter(Activity activity, HashMap<String, Double> data) {
+        public RatesAdapter(Activity activity, ArrayList<CurrencyRate> rateList) {
             inflater = activity.getLayoutInflater();
-            this.data = data;
-            keys = data.keySet().toArray(new String[data.size()]);
+            this.rates = rateList;
+            Collections.sort(rates, new Comparator<CurrencyRate>() {
+                @Override
+                public int compare(CurrencyRate cr1, CurrencyRate cr2) {
+                    return cr1.getName().compareTo(cr2.getName());
+                }
+            });
         }
 
         @Override
         public int getCount() {
-            return data.size();
+            return rates.size();
         }
 
         @Override
         public Object getItem(int position) {
-            return data.get(keys[position]);
+            return rates.get(position);
         }
 
         @Override
@@ -181,24 +240,31 @@ public class MainActivity extends AppCompatActivity {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
 
-            String key = keys[position];
-            Double rate = data.get(key);
+            CurrencyRate rate = rates.get(position);
 
-            int thumbId = getResources().getIdentifier(key, "drawable", getPackageName());
-            viewHolder.thumbnail.setImageResource(thumbId);
-            viewHolder.rate.setText(decimalFormat.format(rate));
+            Currency currency = currenciesMap.get(rate.getName());
 
-            return null;
+            int thumbId = getResources().getIdentifier(rate.getName().toLowerCase(), "drawable", getPackageName());
+            viewHolder.rateThumbnail.setImageResource(thumbId);
+            viewHolder.rateName.setText(String.format("%s(%s)", currency.getName(), currency.getSign()));
+            viewHolder.rateValue.setText(decimalFormat.format(rate.getRate()));
+            viewHolder.rateDescription.setText(currency.getDescription());
+
+            return convertView;
         }
     }
 
     private class ViewHolder {
-        ImageView thumbnail;
-        TextView rate;
+        ImageView rateThumbnail;
+        TextView rateValue;
+        TextView rateName;
+        TextView rateDescription;
 
         public ViewHolder(View view) {
-            thumbnail = (ImageView) view.findViewById(R.id.list_item_rate_thumbnail);
-            rate = (TextView) view.findViewById(R.id.list_item_rate_rateTextView);
+            rateThumbnail = (ImageView) view.findViewById(R.id.list_item_rate_thumbnail);
+            rateName = (TextView) view.findViewById(R.id.list_item_rate_name);
+            rateValue = (TextView) view.findViewById(R.id.list_item_rate_value);
+            rateDescription = (TextView) view.findViewById(R.id.list_item_rate_description);
         }
     }
 }

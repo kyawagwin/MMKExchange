@@ -9,14 +9,18 @@
     tools:context="com.passioncreativestudio.mmkexchange.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <TextView
-        android:text="Hello World!"
-        android:id="@+id/content_main_textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <ListView
-        android:layout_below="@id/content_main_textView"
-        android:id="@+id/content_main_rateListView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <TextView
+            android:textAlignment="center"
+            android:textColor="#FFF"
+            android:background="@color/colorAccent"
+            android:text="Updated On: "
+            android:id="@+id/content_main_updatedDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <ListView
+            android:layout_below="@id/content_main_updatedDate"
+            android:id="@+id/content_main_rateListView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
 </RelativeLayout>

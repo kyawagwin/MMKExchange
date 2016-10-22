@@ -4,8 +4,8 @@ public class Rate {
 
     private String id;
     private String baseCurrency;
-    private Integer v;
-    private Integer rateTimestamp;
+    private int v;
+    private long rateTimestamp;
     private Double MMK;
     private Double ZAR;
     private Double BRL;
@@ -26,8 +26,11 @@ public class Rate {
     private Double JPY;
     private Double EUR;
     private Double USD;
+    private Double MYR;
+    private Double TWD;
+    private Double THB;
 
-    public Rate(String id, String baseCurrency, Integer v, Integer rateTimestamp, Double MMK, Double ZAR, Double BRL, Double RUB, Double INR, Double NOK, Double HKD, Double SGD, Double NZD, Double MXN, Double SEK, Double CNY, Double CHF, Double CAD, Double AUD, Double GBP, Double JPY, Double EUR, Double USD, Double KRW) {
+    public Rate(String id, String baseCurrency, Integer v, Integer rateTimestamp, Double MMK, Double ZAR, Double BRL, Double RUB, Double INR, Double NOK, Double HKD, Double SGD, Double NZD, Double MXN, Double SEK, Double CNY, Double CHF, Double CAD, Double AUD, Double GBP, Double JPY, Double EUR, Double USD, Double KRW, Double MYR, Double TWD, Double THB) {
         this.KRW = KRW;
         this.id = id;
         this.baseCurrency = baseCurrency;
@@ -52,6 +55,9 @@ public class Rate {
         this.JPY = JPY;
         this.EUR = EUR;
         this.USD = USD;
+        this.MYR = MYR;
+        this.TWD = TWD;
+        this.THB = THB;
     }
 
     public String getId() {
@@ -66,7 +72,7 @@ public class Rate {
         return v;
     }
 
-    public Integer getRateTimestamp() {
+    public long getRateTimestamp() {
         return rateTimestamp;
     }
 
@@ -147,6 +153,18 @@ public class Rate {
     }
 
     public Double getUSD() {
+        return USD;
+    }
+
+    public Double getMYR() {
+        return USD;
+    }
+
+    public Double getTWD() {
+        return USD;
+    }
+
+    public Double getTHB() {
         return USD;
     }
 }

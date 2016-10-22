@@ -1,0 +1,164 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:key="AUD"
+        android:title="AUD ($)"
+        android:summary="Australia Dollar"
+        android:defaultValue="true"
+        android:icon="@drawable/aud"/>
+
+    <CheckBoxPreference
+        android:key="BRL"
+        android:title="BRL (R$)"
+        android:summary="Brazilian Real"
+        android:defaultValue="true"
+        android:icon="@drawable/brl"/>
+
+    <CheckBoxPreference
+        android:key="CAD"
+        android:title="CAD ($)"
+        android:summary="Canada Dollar"
+        android:defaultValue="true"
+        android:icon="@drawable/cad"/>
+
+    <CheckBoxPreference
+        android:key="CHF"
+        android:title="CHF (Fr)"
+        android:summary="Swiss Franc"
+        android:defaultValue="true"
+        android:icon="@drawable/chf"/>
+
+    <CheckBoxPreference
+        android:key="CNY"
+        android:title="CNY (¥)"
+        android:summary="Chinese Yuan"
+        android:defaultValue="true"
+        android:icon="@drawable/cny"/>
+
+    <CheckBoxPreference
+        android:key="EUR"
+        android:title="EUR (€)"
+        android:summary="Euro"
+        android:defaultValue="true"
+        android:icon="@drawable/eur"/>
+
+    <CheckBoxPreference
+        android:key="GBP"
+        android:title="GBP (£)"
+        android:summary="Pound Sterling"
+        android:defaultValue="true"
+        android:icon="@drawable/gbp"/>
+
+    <CheckBoxPreference
+        android:key="HKD"
+        android:title="HKD ($)"
+        android:summary="Hong Kong Dollar"
+        android:defaultValue="true"
+        android:icon="@drawable/hkd"/>
+
+    <CheckBoxPreference
+        android:key="INR"
+        android:title="INR (₹)"
+        android:summary="Indian Rupee"
+        android:defaultValue="true"
+        android:icon="@drawable/inr"/>
+
+    <CheckBoxPreference
+        android:key="jpy"
+        android:title="JPY (¥)"
+        android:summary="Japanese Yen"
+        android:defaultValue="true"
+        android:icon="@drawable/jpy"/>
+
+    <CheckBoxPreference
+        android:key="KRW"
+        android:title="KRW (₩)"
+        android:summary="South Korean Won"
+        android:defaultValue="true"
+        android:icon="@drawable/krw"/>
+
+    <CheckBoxPreference
+        android:key="MMK"
+        android:title="MMK (Ks)"
+        android:summary="Myanmar Kyat"
+        android:defaultValue="true"
+        android:icon="@drawable/mmk"/>
+
+    <CheckBoxPreference
+        android:key="MXN"
+        android:title="MXN ($)"
+        android:summary="Mexican Peso"
+        android:defaultValue="true"
+        android:icon="@drawable/mxn"/>
+
+    <CheckBoxPreference
+        android:key="MYR"
+        android:title="MYR (RM)"
+        android:summary="Malaysia Ringgit"
+        android:defaultValue="true"
+        android:icon="@drawable/myr"/>
+
+    <CheckBoxPreference
+        android:key="NOK"
+        android:title="NOK (kr)"
+        android:summary="Norwegian Krone"
+        android:defaultValue="true"
+        android:icon="@drawable/nok"/>
+
+    <CheckBoxPreference
+        android:key="NZD"
+        android:title="NZD ($)"
+        android:summary="New Zealand Dollar"
+        android:defaultValue="true"
+        android:icon="@drawable/nzd"/>
+
+    <CheckBoxPreference
+        android:key="RUB"
+        android:title="RUB (₽)"
+        android:summary="Russian Ruble"
+        android:defaultValue="true"
+        android:icon="@drawable/rub"/>
+
+    <CheckBoxPreference
+        android:key="SEK"
+        android:title="SEK (kr)"
+        android:summary="Swedish Krona"
+        android:defaultValue="true"
+        android:icon="@drawable/sek"/>
+
+    <CheckBoxPreference
+        android:key="SGD"
+        android:title="SGD ($)"
+        android:summary="Singapore Dollar"
+        android:defaultValue="true"
+        android:icon="@drawable/sgd"/>
+
+    <CheckBoxPreference
+        android:key="THB"
+        android:title="THB (฿)"
+        android:summary="Thailand Baht"
+        android:defaultValue="true"
+        android:icon="@drawable/thb"/>
+
+    <CheckBoxPreference
+        android:key="TWD"
+        android:title="TWD ($)"
+        android:summary="Taiwan Dollar"
+        android:defaultValue="true"
+        android:icon="@drawable/twd"/>
+
+    <CheckBoxPreference
+        android:key="USD"
+        android:title="USD ($)"
+        android:summary="United States Dollar"
+        android:defaultValue="true"
+        android:icon="@drawable/usd"/>
+
+    <CheckBoxPreference
+        android:key="ZAR"
+        android:title="ZAR (R)"
+        android:summary="South African Rand"
+        android:defaultValue="true"
+        android:icon="@drawable/zar"/>
+
+</PreferenceScreen>
