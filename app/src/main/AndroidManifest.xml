@@ -23,7 +23,14 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+            android:label="@string/title_activity_settings" />
+
+        <receiver android:name=".RateReceiver" />
+
+        <activity
+            android:name=".PairActivity"
+            android:label="@string/title_activity_pair"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

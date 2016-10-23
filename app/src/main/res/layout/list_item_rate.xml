@@ -5,6 +5,7 @@
     android:layout_height="64dp">
 
     <ImageView
+        android:contentDescription="Country"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         android:id="@+id/list_item_rate_thumbnail"
@@ -12,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="4dp"
         android:layout_marginRight="4dp"
-        android:src="@drawable/aud"/>
+        android:src="@mipmap/ic_launcher"/>
 
     <TextView
         android:layout_marginTop="10dp"

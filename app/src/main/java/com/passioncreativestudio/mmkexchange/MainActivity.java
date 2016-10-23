@@ -1,7 +1,10 @@
 package com.passioncreativestudio.mmkexchange;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,9 +15,10 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +26,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -31,17 +38,12 @@ import com.google.gson.Gson;
 
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private ListView rateListView;
     private TextView rateDatetime;
+    private EditText searchCurrency;
 
     private DecimalFormat decimalFormat = new DecimalFormat("0.00");
     private static String url = "http://mmk-exchange.herokuapp.com/api/latest";
@@ -57,8 +60,13 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> selectedCurrencies;
     private Date rateDate;
 
+    private RatesAdapter adapter;
+
     ArrayList<CurrencyRate> rateList;
     StringBuilder sb = new StringBuilder();
+
+    private PendingIntent pendingIntent;
+    private AlarmManager alarmManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +90,26 @@ public class MainActivity extends AppCompatActivity {
         rateList = new ArrayList<>();
         rateListView = (ListView) findViewById(R.id.content_main_rateListView);
         rateDatetime = (TextView) findViewById(R.id.content_main_updatedDate);
+        searchCurrency = (EditText) findViewById(R.id.content_main_searchCurrency);
+
+        searchCurrency.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                adapter.rates = adapter.ratesUnfiltered;
+                // adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onTextChanged(CharSequence rateName, int i, int i1, int i2) {
+                Log.e(TAG, rateName.toString());
+                adapter.getFilter().filter(rateName);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -96,6 +124,8 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Please, check your internet connection!", Toast.LENGTH_LONG).show();
         }
+
+
     }
 
     public boolean isNetworkConnected() {
@@ -117,6 +147,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_settings:
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
+                return true;
+            case R.id.action_pair:
+                startActivity(new Intent(this, PairActivity.class));
                 return true;
             case R.id.action_refresh:
                 if(isNetworkConnected()) {
@@ -162,7 +195,9 @@ public class MainActivity extends AppCompatActivity {
                             if (value != null) {
                                 sb.append(field.getName() + "=" + value);
 
-                                rateList.add(new CurrencyRate(field.getName(), value));
+                                Currency cur = currenciesMap.get(field.getName());
+
+                                rateList.add(new CurrencyRate(field.getName(), value, cur.getDescription()));
                             }
                         } else if(field.getName().equals("rateTimestamp")) {
                             long rateTimestamp = (long) field.get(rate);
@@ -193,14 +228,16 @@ public class MainActivity extends AppCompatActivity {
 
             rateDatetime.setText(String.format("Updated On: %s", rateDateFormat.format(rateDate)));
 
-            RatesAdapter adapter  = new RatesAdapter(MainActivity.this, rateList);
+            adapter  = new RatesAdapter(MainActivity.this, rateList);
             rateListView.setAdapter(adapter);
         }
     }
 
-    private class RatesAdapter extends BaseAdapter {
+    private class RatesAdapter extends BaseAdapter implements Filterable {
+        private RateNameFilter rateNameFilter;
         private LayoutInflater inflater;
         private ArrayList<CurrencyRate> rates;
+        private ArrayList<CurrencyRate> ratesUnfiltered;
 
         public RatesAdapter(Activity activity, ArrayList<CurrencyRate> rateList) {
             inflater = activity.getLayoutInflater();
@@ -211,6 +248,7 @@ public class MainActivity extends AppCompatActivity {
                     return cr1.getName().compareTo(cr2.getName());
                 }
             });
+            this.ratesUnfiltered = rates;
         }
 
         @Override
@@ -246,11 +284,55 @@ public class MainActivity extends AppCompatActivity {
 
             int thumbId = getResources().getIdentifier(rate.getName().toLowerCase(), "drawable", getPackageName());
             viewHolder.rateThumbnail.setImageResource(thumbId);
+            viewHolder.rateThumbnail.setContentDescription(currency.getName());
             viewHolder.rateName.setText(String.format("%s(%s)", currency.getName(), currency.getSign()));
             viewHolder.rateValue.setText(decimalFormat.format(rate.getRate()));
             viewHolder.rateDescription.setText(currency.getDescription());
 
             return convertView;
+        }
+
+        @Override
+        public Filter getFilter() {
+            if(rateNameFilter == null) {
+                rateNameFilter = new RateNameFilter();
+            }
+
+            return rateNameFilter;
+        }
+
+        private class RateNameFilter extends Filter {
+
+            @Override
+            protected FilterResults performFiltering(CharSequence currencyName) {
+                FilterResults results = new FilterResults();
+                if(currencyName != null && currencyName.length() > 0) {
+                    ArrayList<CurrencyRate> filterRates = new ArrayList<>();
+                    for(int i = 0; i < rates.size(); i++) {
+                        if(rates.get(i).getName().toUpperCase().contains(currencyName.toString().toUpperCase()) || rates.get(i).getDescription().toUpperCase().contains(currencyName.toString().toUpperCase())) {
+                            CurrencyRate rate = new CurrencyRate();
+                            rate.setName(rates.get(i).getName());
+                            rate.setRate(rates.get(i).getRate());
+
+                            filterRates.add(rate);
+                        }
+                    }
+
+                    results.count = filterRates.size();
+                    results.values = filterRates;
+                } else {
+                    results.count = ratesUnfiltered.size();
+                    results.values = ratesUnfiltered;
+                }
+
+                return results;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                rates = (ArrayList<CurrencyRate>) filterResults.values;
+                notifyDataSetChanged();
+            }
         }
     }
 

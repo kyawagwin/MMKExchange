@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.passioncreativestudio.mmkexchange.MainActivity"
     tools:showIn="@layout/activity_main">
 
@@ -17,8 +19,22 @@
             android:id="@+id/content_main_updatedDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
-        <ListView
+
+        <EditText
             android:layout_below="@id/content_main_updatedDate"
+            android:maxLines="1"
+            android:hint="Search currency..."
+            android:id="@+id/content_main_searchCurrency"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nextFocusUp="@id/content_main_searchCurrency"
+            android:nextFocusLeft="@id/content_main_searchCurrency"
+            android:selectAllOnFocus="true"
+            android:imeOptions="actionDone"
+            android:inputType="text"/>
+
+        <ListView
+            android:layout_below="@id/content_main_searchCurrency"
             android:id="@+id/content_main_rateListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
