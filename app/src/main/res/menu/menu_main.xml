@@ -9,11 +9,13 @@
         app:showAsAction="always"
         android:icon="@drawable/ic_refresh" />
 
+    <!--
     <item
         android:id="@+id/action_pair"
         android:title="Pair"
         app:showAsAction="always"
         android:icon="@drawable/ic_pair" />
+    -->
 
     <item
         android:id="@+id/action_settings"

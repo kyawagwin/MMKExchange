@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.Filter;
@@ -119,6 +120,24 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        rateListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                CurrencyRate currencyRate = adapter.rates.get(position);
+                if(currencyRate == null) {
+                    Snackbar.make(view, "Chart not found!", Snackbar.LENGTH_SHORT)
+                            .setAction("Action", null).show();
+                    return;
+                }
+
+                Intent chartIntent = new Intent(MainActivity.this, ChartActivity.class);
+                chartIntent.putExtra("Currency", currencyRate.getName());
+                chartIntent.putExtra("Rate", currencyRate.getRate());
+
+                startActivity(chartIntent);
+            }
+        });
+
         if(isNetworkConnected()) {
             new GetRates().execute();
         } else {
@@ -148,9 +167,11 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
+            /*
             case R.id.action_pair:
-                startActivity(new Intent(this, PairActivity.class));
+                startActivity(new Intent(this, ChartActivity.class));
                 return true;
+            */
             case R.id.action_refresh:
                 if(isNetworkConnected()) {
                     new GetRates().execute();
