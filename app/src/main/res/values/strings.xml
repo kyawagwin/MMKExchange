@@ -76,4 +76,8 @@
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="title_activity_pair">PairActivity</string>
     <string name="title_activity_chart">ChartActivity</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>

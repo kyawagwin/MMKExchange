@@ -1,4 +1,4 @@
-package com.passioncreativestudio.mmkexchange;
+package com.passioncreativestudio.mmkexchange.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.passioncreativestudio.mmkexchange.R;
 
 import java.text.DecimalFormat;
 
@@ -74,7 +75,7 @@ public class ChartActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                Intent homeIntent = new Intent(this, MainActivity.class);
+                Intent homeIntent = new Intent(this, Main2Activity.class);
                 homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(homeIntent);
         }

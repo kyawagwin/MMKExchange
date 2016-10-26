@@ -1,4 +1,4 @@
-package com.passioncreativestudio.mmkexchange;
+package com.passioncreativestudio.mmkexchange.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import com.passioncreativestudio.mmkexchange.R;
 
 public class PairActivity extends AppCompatActivity {
 
@@ -48,7 +50,7 @@ public class PairActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                Intent homeIntent = new Intent(this, MainActivity.class);
+                Intent homeIntent = new Intent(this, Main2Activity.class);
                 homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(homeIntent);
         }

@@ -1,10 +1,9 @@
-package com.passioncreativestudio.mmkexchange;
+package com.passioncreativestudio.mmkexchange.activity;
 
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -36,6 +35,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.passioncreativestudio.mmkexchange.Currency;
+import com.passioncreativestudio.mmkexchange.CurrencyRate;
+import com.passioncreativestudio.mmkexchange.HttpHandler;
+import com.passioncreativestudio.mmkexchange.R;
+import com.passioncreativestudio.mmkexchange.Rate;
 
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
@@ -46,8 +50,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 
-public class MainActivity extends AppCompatActivity {
-    private static final String TAG = MainActivity.class.getSimpleName();
+public class Main2Activity extends AppCompatActivity {
+    private static final String TAG = Main2Activity.class.getSimpleName();
 
     private ProgressDialog progressDialog;
     private ListView rateListView;
@@ -72,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main2);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -130,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                Intent chartIntent = new Intent(MainActivity.this, ChartActivity.class);
+                Intent chartIntent = new Intent(Main2Activity.this, ChartActivity.class);
                 chartIntent.putExtra("Currency", currencyRate.getName());
                 chartIntent.putExtra("Rate", currencyRate.getRate());
 
@@ -156,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_main2, menu);
         return true;
     }
 
@@ -193,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             // show progress dialog
-            progressDialog = new ProgressDialog(MainActivity.this);
+            progressDialog = new ProgressDialog(Main2Activity.this);
             progressDialog.setMessage("Please wait...");
             progressDialog.setCancelable(false);
             progressDialog.show();
@@ -243,13 +247,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if(rateList.size() == 0) {
-                Toast.makeText(MainActivity.this, "API Error!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Main2Activity.this, "API Error!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             rateDatetime.setText(String.format("Updated On: %s", rateDateFormat.format(rateDate)));
 
-            adapter  = new RatesAdapter(MainActivity.this, rateList);
+            adapter  = new RatesAdapter(Main2Activity.this, rateList);
             rateListView.setAdapter(adapter);
         }
     }

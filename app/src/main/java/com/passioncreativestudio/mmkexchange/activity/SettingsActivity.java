@@ -1,13 +1,16 @@
-package com.passioncreativestudio.mmkexchange;
+package com.passioncreativestudio.mmkexchange.activity;
 
+import android.app.ActionBar;
 import android.content.Intent;
-import android.support.v7.app.ActionBar;
+import android.preference.PreferenceActivity;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class SettingsActivity extends AppCompatPreferenceActivity {
+import com.passioncreativestudio.mmkexchange.R;
+
+public class SettingsActivity extends PreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,7 +30,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        ActionBar ab = getSupportActionBar();
+        ActionBar ab = getActionBar();
         if (ab != null) {
             ab.setHomeButtonEnabled(true);
             ab.setDisplayHomeAsUpEnabled(true);
@@ -41,7 +44,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                Intent homeIntent = new Intent(this, MainActivity.class);
+                Intent homeIntent = new Intent(this, Main2Activity.class);
                 homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(homeIntent);
         }
