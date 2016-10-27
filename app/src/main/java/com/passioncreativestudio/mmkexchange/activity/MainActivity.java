@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity
 
                                 Currency cur = currenciesMap.get(field.getName());
 
-                                currencyRates.add(new CurrencyRate(field.getName(), value, cur.getDescription()));
+                                currencyRates.add(new CurrencyRate(field.getName(), 1 / value, cur.getDescription()));
                             }
                         } else if(field.getName().equals("rateTimestamp")) {
                             long rateTimestamp = (long) field.get(rate);
