@@ -4,13 +4,24 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,7 +55,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -63,26 +74,24 @@ public class MainActivity extends AppCompatActivity
 
     StringBuilder sb = new StringBuilder();
 
-    private ListView curRateListView;
-    private View rootView;
+    private RecyclerView curRateRV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        rootView = findViewById(android.R.id.content);
-        curRateListView = (ListView) findViewById(R.id.content_main_curRateListView);
+        curRateRV = (RecyclerView) findViewById(R.id.content_main_curRatesRV);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.app_bar_main_refreshFab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                if(isNetworkConnected())
+                    new GetRates().execute();
             }
         });
 
@@ -107,19 +116,22 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+        adapter = new RatesAdapter(currencyRates);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        curRateRV.setLayoutManager(mLayoutManager);
+        curRateRV.setItemAnimator(new DefaultItemAnimator());
+        curRateRV.setAdapter(adapter);
+        setUpItemTouchHelper();
+
+
+
         if(isNetworkConnected()) {
             new GetRates().execute();
         } else {
-            Snackbar.make(rootView, "Replace with your own action", Snackbar.LENGTH_LONG)
+            Snackbar.make(findViewById(R.id.app_bar_main_refreshFab), "Network is not connected!", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             //Toast.makeText(this, "Please, check your internet connection!", Toast.LENGTH_LONG).show();
         }
-    }
-
-    private boolean isNetworkConnected() {
-        final ConnectivityManager conMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        final NetworkInfo activeNetwork = conMgr.getActiveNetworkInfo();
-        return activeNetwork != null && activeNetwork.getState() == NetworkInfo.State.CONNECTED;
     }
 
     @Override
@@ -173,6 +185,93 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    private void setUpItemTouchHelper() {
+
+
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+
+            // we want to cache these and not allocate anything repeatedly in the onChildDraw method
+            Drawable background;
+            Drawable xMark;
+            int xMarkMargin;
+            boolean initiated;
+
+            private void init() {
+                background = new ColorDrawable(Color.RED);
+                xMark = ContextCompat.getDrawable(MainActivity.this, R.drawable.ic_action_remove);
+                xMark.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+                xMarkMargin = (int) MainActivity.this.getResources().getDimension(R.dimen.ic_clear_margin);
+                initiated = true;
+            }
+
+            // not important, we don't want drag & drop
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public int getSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                int position = viewHolder.getAdapterPosition();
+                if (adapter.isUndoOn() && adapter.isPendingRemoval(position)) {
+                    return 0;
+                }
+                return super.getSwipeDirs(recyclerView, viewHolder);
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                int swipedPosition = viewHolder.getAdapterPosition();
+                boolean undoOn = adapter.isUndoOn();
+                if (undoOn) {
+                    adapter.pendingRemoval(swipedPosition);
+                } else {
+                    adapter.remove(swipedPosition);
+                }
+            }
+
+            @Override
+            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                View itemView = viewHolder.itemView;
+
+                // not sure why, but this method get's called for viewholder that are already swiped away
+                if (viewHolder.getAdapterPosition() == -1) {
+                    // not interested in those
+                    return;
+                }
+
+                if (!initiated) {
+                    init();
+                }
+
+                /*
+                // draw red background
+                background.setBounds(itemView.getRight() + (int) dX, itemView.getTop(), itemView.getRight(), itemView.getBottom());
+                background.draw(c);
+
+                // draw x mark RIGHT
+                int itemHeight = itemView.getBottom() - itemView.getTop();
+                int intrinsicWidth = xMark.getIntrinsicWidth();
+                int intrinsicHeight = xMark.getIntrinsicWidth();
+
+                int xMarkLeft = itemView.getRight() - xMarkMargin - intrinsicWidth;
+                int xMarkRight = itemView.getRight() - xMarkMargin;
+                int xMarkTop = itemView.getTop() + (itemHeight - intrinsicHeight)/2;
+                int xMarkBottom = xMarkTop + intrinsicHeight;
+                xMark.setBounds(xMarkLeft, xMarkTop, xMarkRight, xMarkBottom);
+
+                xMark.draw(c);
+                */
+
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+
+        };
+        ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        mItemTouchHelper.attachToRecyclerView(curRateRV);
+    }
+
 
     private class GetRates extends AsyncTask<Void, Void, Void> {
 
@@ -229,26 +328,30 @@ public class MainActivity extends AppCompatActivity
             }
 
             if(currencyRates.size() == 0) {
-                Snackbar.make(findViewById(android.R.id.content), "No response from the server!", Snackbar.LENGTH_LONG)
+                Snackbar.make(findViewById(R.id.fab), "No response from the server!", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 //Toast.makeText(MainActivity.this, "API Error!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             // TODO: 26/10/16 call snackbar to show the updated rate datetime
-            //rateDatetime.setText(String.format("Updated On: %s", rateDateFormat.format(rateDate)));
+            Snackbar.make(findViewById(R.id.app_bar_main_refreshFab), String.format("Updated: %s", rateDatetimeFormat.format(rateDate)), Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
 
-            adapter  = new MainActivity.RatesAdapter(MainActivity.this, currencyRates);
-            curRateListView.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
         }
     }
 
-    private class RatesAdapter extends BaseAdapter {
-        private LayoutInflater inflater;
-        private ArrayList<CurrencyRate> currencyRates;
+    private class RatesAdapter extends RecyclerView.Adapter<RateViewHolder> {
+        private static final int PENDING_REMOVAL_TIMEOUT = 3000; // 3sec
 
-        public RatesAdapter(Activity activity, ArrayList<CurrencyRate> currencyRates) {
-            inflater = activity.getLayoutInflater();
+        private ArrayList<CurrencyRate> currencyRates;
+        private ArrayList<CurrencyRate> currencyRatesPendingRemoval;
+        boolean undoOn; // is undo on, you can turn it on from the toolbar menu
+        private Handler handler = new Handler(); // hanlder for running delayed runnables
+        HashMap<CurrencyRate, Runnable> pendingRunnables = new HashMap<>(); // map of items to pending runnables, so we can cancel a removal if need be
+
+        public RatesAdapter(ArrayList<CurrencyRate> currencyRates) {
             this.currencyRates = currencyRates;
             Collections.sort(currencyRates, new Comparator<CurrencyRate>() {
                 @Override
@@ -256,16 +359,29 @@ public class MainActivity extends AppCompatActivity
                     return cr1.getName().compareTo(cr2.getName());
                 }
             });
+
+            currencyRatesPendingRemoval = new ArrayList<>();
         }
 
         @Override
-        public int getCount() {
-            return currencyRates.size();
+        public RateViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_rate, parent, false);
+
+            return new RateViewHolder(view);
         }
 
         @Override
-        public Object getItem(int position) {
-            return currencyRates.get(position);
+        public void onBindViewHolder(RateViewHolder holder, int position) {
+            CurrencyRate rate = currencyRates.get(position);
+
+            Currency currency = currenciesMap.get(rate.getName());
+
+            int thumbId = getResources().getIdentifier(rate.getName().toLowerCase(), "drawable", getPackageName());
+            holder.rateThumbnail.setImageResource(thumbId);
+            holder.rateThumbnail.setContentDescription(currency.getName());
+            holder.rateName.setText(String.format("%s(%s)", currency.getName(), currency.getSign()));
+            holder.rateValue.setText(curRateFormat.format(rate.getRate()));
+            holder.rateDescription.setText(currency.getDescription());
         }
 
         @Override
@@ -274,39 +390,62 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            MainActivity.ViewHolder viewHolder;
+        public int getItemCount() {
+            return currencyRates.size();
+        }
 
-            if(convertView == null) {
-                convertView = inflater.inflate(R.layout.list_item_rate, parent, false);
-                viewHolder = new MainActivity.ViewHolder(convertView);
-                convertView.setTag(viewHolder);
-            } else {
-                viewHolder = (MainActivity.ViewHolder) convertView.getTag();
+        public void setUndoOn(boolean undoOn) {
+            this.undoOn = undoOn;
+        }
+
+        public boolean isUndoOn() {
+            return undoOn;
+        }
+
+        public void pendingRemoval(int position) {
+            final CurrencyRate rate = currencyRates.get(position);
+            if (!currencyRatesPendingRemoval.contains(rate)) {
+                currencyRatesPendingRemoval.add(rate);
+                // this will redraw row in "undo" state
+                notifyItemChanged(position);
+                // let's create, store and post a runnable to remove the item
+                Runnable pendingRemovalRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        remove(currencyRates.indexOf(rate));
+                    }
+                };
+                handler.postDelayed(pendingRemovalRunnable, PENDING_REMOVAL_TIMEOUT);
+                pendingRunnables.put(rate, pendingRemovalRunnable);
             }
+        }
 
+        public void remove(int position) {
             CurrencyRate rate = currencyRates.get(position);
+            if (currencyRatesPendingRemoval.contains(rate)) {
+                currencyRatesPendingRemoval.remove(rate);
+            }
+            if (currencyRates.contains(rate)) {
+                currencyRates.remove(position);
+                notifyItemRemoved(position);
+            }
+        }
 
-            Currency currency = currenciesMap.get(rate.getName());
-
-            int thumbId = getResources().getIdentifier(rate.getName().toLowerCase(), "drawable", getPackageName());
-            viewHolder.rateThumbnail.setImageResource(thumbId);
-            viewHolder.rateThumbnail.setContentDescription(currency.getName());
-            viewHolder.rateName.setText(String.format("%s(%s)", currency.getName(), currency.getSign()));
-            viewHolder.rateValue.setText(curRateFormat.format(rate.getRate()));
-            viewHolder.rateDescription.setText(currency.getDescription());
-
-            return convertView;
+        public boolean isPendingRemoval(int position) {
+            CurrencyRate rate = currencyRates.get(position);
+            return currencyRates.contains(rate);
         }
     }
 
-    private class ViewHolder {
+    private class RateViewHolder extends RecyclerView.ViewHolder {
         ImageView rateThumbnail;
         TextView rateValue;
         TextView rateName;
         TextView rateDescription;
 
-        public ViewHolder(View view) {
+        public RateViewHolder(View view) {
+            super(view);
+
             rateThumbnail = (ImageView) view.findViewById(R.id.list_item_rate_thumbnail);
             rateName = (TextView) view.findViewById(R.id.list_item_rate_name);
             rateValue = (TextView) view.findViewById(R.id.list_item_rate_value);

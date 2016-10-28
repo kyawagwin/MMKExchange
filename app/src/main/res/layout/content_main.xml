@@ -9,9 +9,9 @@
     tools:context="com.passioncreativestudio.mmkexchange.activity.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-        <ListView
-            android:id="@+id/content_main_curRateListView"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/content_main_curRatesRV"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content" />
 
 </RelativeLayout>
