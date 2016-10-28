@@ -57,8 +57,6 @@ import java.util.HashMap;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    private static final String TAG = MainActivity.class.getSimpleName();
-
     private ProgressDialog progressDialog;
 
     private DecimalFormat curRateFormat = new DecimalFormat("0.00");
