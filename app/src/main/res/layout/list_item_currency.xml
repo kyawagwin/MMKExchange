@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="5dp"
+    app:cardCornerRadius="4dp">
+
+    <RelativeLayout
+        android:paddingBottom="6dp"
+        android:paddingLeft="6dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:scaleType="centerCrop"
+            android:contentDescription="Country"
+            android:id="@+id/list_item_currency_flagIV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/usd" />
+
+        <TextView
+            android:id="@+id/list_item_currency_curName"
+            android:text="USD($)"
+            android:layout_below="@id/list_item_currency_flagIV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_below="@id/list_item_currency_curName"
+            android:text="United States Dollar"
+            android:id="@+id/list_item_currency_curDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:layout_margin="10dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_action_selected"
+            android:id="@+id/list_item_currency_isSelectedIV"
+            android:layout_width="16dp"
+            android:layout_height="16dp" />
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

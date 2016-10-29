@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,8 +16,7 @@ import com.passioncreativestudio.mmkexchange.R;
 
 import java.text.DecimalFormat;
 
-public class ChartActivity extends AppCompatActivity {
-    private static final String TAG = ChartActivity.class.getSimpleName();
+public class ChartActivity extends BaseActivity {
 
     ImageView fiveDayGraph;
     ImageView threeMonthGraph;
@@ -27,9 +25,13 @@ public class ChartActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_chart);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -45,11 +47,11 @@ public class ChartActivity extends AppCompatActivity {
         oneYearGraph = (ImageView) findViewById(R.id.content_chart_oneYearRateGraph);
 
         Intent intent = getIntent();
-        String currency = intent.getStringExtra("Currency");
-        Double rate = intent.getDoubleExtra("Rate", 0);
+        String currency = intent.getStringExtra(MainActivity.SEND_CURRENCY_NAME);
+        Double rate = intent.getDoubleExtra(MainActivity.SEND_CURRENCY_RATE, 0);
 
         if(!currency.isEmpty()) {
-            getSupportActionBar().setTitle(String.format("Current: %s", new DecimalFormat("0.00").format(rate)));
+            getSupportActionBar().setTitle(String.format("%s: %s Ks", currency, new DecimalFormat("0.00").format(rate)));
 
             Glide.with(this).load("https://chart.finance.yahoo.com/w?s=" + currency + "MMK%3dX&lang=en-SG&region=SG").into(fiveDayGraph);
             Glide.with(this).load("https://chart.finance.yahoo.com/3m?" + currency + "MMK=x&lang=en-SG&region=SG").into(threeMonthGraph);
@@ -75,8 +77,8 @@ public class ChartActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                Intent homeIntent = new Intent(this, Main2Activity.class);
-                homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                Intent homeIntent = new Intent(this, MainActivity.class);
+                homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(homeIntent);
         }
 

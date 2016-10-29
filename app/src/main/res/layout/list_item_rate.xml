@@ -68,7 +68,6 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:src="@drawable/uparrow"
             android:id="@+id/list_item_rate_statusIV"
             android:layout_width="16dp"
             android:layout_height="16dp" />

@@ -11,7 +11,7 @@
     tools:showIn="@layout/app_bar_currency_list">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/content_main_curListRV"
+        android:id="@+id/content_currency_list_curListRV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

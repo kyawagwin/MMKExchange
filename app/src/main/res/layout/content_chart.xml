@@ -1,72 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content_chart"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.passioncreativestudio.mmkexchange.activity.ChartActivity"
-    android:orientation="vertical"
     tools:showIn="@layout/activity_chart">
 
-    <TextView
-        android:textStyle="italic"
-        android:textAlignment="center"
-        android:text="Five Days"
-        android:id="@+id/content_chart_fiveDayTextView"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent">
 
-    <ImageView
-        android:src="@drawable/rate_graph"
-        android:id="@+id/content_chart_fiveDayRateGraph"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"/>
+        <android.support.v7.widget.CardView
+            android:id="@+id/content_chart_fiveDayChart"
+            android:layout_margin="5dp"
+            android:elevation="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="250dp">
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-    <View
-        android:background="@color/colorPrimaryDark"
-        android:layout_width="match_parent"
-        android:layout_height="1dp" />
+                <TextView
+                    android:textStyle="bold"
+                    android:textAlignment="center"
+                    android:text="Five Days"
+                    android:id="@+id/content_chart_fiveDayTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-    <TextView
-        android:textStyle="italic"
-        android:textAlignment="center"
-        android:text="Three Months"
-        android:id="@+id/content_chart_threeMonthTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+                <ImageView
+                    android:src="@drawable/rate_graph"
+                    android:id="@+id/content_chart_fiveDayRateGraph"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-    <ImageView
-        android:src="@drawable/rate_graph"
-        android:id="@+id/content_chart_threeMonthRateGraph"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"/>
+            </LinearLayout>
 
-    <View
-        android:background="@color/colorPrimaryDark"
-        android:layout_width="match_parent"
-        android:layout_height="1dp" />
+        </android.support.v7.widget.CardView>
 
-    <TextView
-        android:textStyle="italic"
-        android:textAlignment="center"
-        android:text="One Year"
-        android:id="@+id/content_chart_oneYearTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <android.support.v7.widget.CardView
+            android:layout_below="@id/content_chart_fiveDayChart"
+            android:id="@+id/content_chart_threeMonthChart"
+            android:layout_margin="5dp"
+            android:elevation="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="250dp">
 
-    <ImageView
-        android:src="@drawable/rate_graph"
-        android:id="@+id/content_chart_oneYearRateGraph"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"/>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-</LinearLayout>
+                <TextView
+                    android:textStyle="bold"
+                    android:textAlignment="center"
+                    android:text="Three Months"
+                    android:id="@+id/content_chart_threeMonthTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <ImageView
+                    android:src="@drawable/rate_graph"
+                    android:id="@+id/content_chart_threeMonthRateGraph"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_below="@id/content_chart_threeMonthChart"
+            android:id="@+id/content_chart_oneYearChart"
+            android:layout_margin="5dp"
+            android:elevation="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="250dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:textStyle="bold"
+                    android:textAlignment="center"
+                    android:text="One Year"
+                    android:id="@+id/content_chart_oneYearTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <ImageView
+                    android:src="@drawable/rate_graph"
+                    android:id="@+id/content_chart_oneYearRateGraph"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+    </RelativeLayout>
+
+</ScrollView>
