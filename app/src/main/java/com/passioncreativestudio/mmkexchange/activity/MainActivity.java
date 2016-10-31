@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -53,6 +54,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 
+import static com.passioncreativestudio.mmkexchange.AppRater.APP_DOMAIN;
+
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     static final int ADD_CURRENCY_REQUEST = 101;
@@ -83,6 +86,7 @@ public class MainActivity extends BaseActivity
     private FloatingActionButton fab;
 
     private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +118,7 @@ public class MainActivity extends BaseActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        editor = sharedPreferences.edit();
 
         Date yesterdayDate = getYesterdayDate();
         apiHistoryUrl += historyDateFormat.format(yesterdayDate);
@@ -139,7 +144,8 @@ public class MainActivity extends BaseActivity
         */
 
 
-
+        currencyRates = new ArrayList<>();
+        currencyRatesHistory = new ArrayList<>();
 
 
         adapter = new RatesAdapter(currencyRates);
@@ -153,6 +159,8 @@ public class MainActivity extends BaseActivity
 
 
         getRates();
+
+        //AppRater.appLaunched(this);
     }
 
     @Override
@@ -197,8 +205,8 @@ public class MainActivity extends BaseActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_info) {
-            Toast.makeText(this, "contact at: kyawagwin@gmail.com", Toast.LENGTH_LONG).show();
+        if (id == R.id.nav_rate) {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + APP_DOMAIN)));
         }
 
         /*
@@ -244,7 +252,6 @@ public class MainActivity extends BaseActivity
 
     private Date getYesterdayDate() {
         currenciesMap = Currency.initCurrencies();
-        currencyRates = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -1);
         return calendar.getTime();
@@ -404,8 +411,9 @@ public class MainActivity extends BaseActivity
             jsonStr = handler.makeServiceCall(apiHistoryUrl, "GET");
             if (jsonStr != null) {
                 try {
+                    currencyRatesHistory.clear();
+
                     historyRate = gson.fromJson(jsonStr, Rate.class);
-                    currencyRatesHistory = new ArrayList<>();
                     for (Field field : historyRate.getClass().getDeclaredFields()) {
                         field.setAccessible(true); // You might want to set modifier to public first.
                         if(selectedCurrencies.contains(field.getName())) {
@@ -435,7 +443,7 @@ public class MainActivity extends BaseActivity
             }
 
 
-            if(currencyRates.size() == 0) {
+            if(currencyRates.size() == 0 || currencyRatesHistory.size() == 0) {
                 /*
                 Snackbar.make(findViewById(R.id.fab), "No response from the server!", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
@@ -501,6 +509,9 @@ public class MainActivity extends BaseActivity
                 holder.rateStatusIV.setImageResource(R.drawable.downarrow);
             }
 
+
+
+
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -510,6 +521,8 @@ public class MainActivity extends BaseActivity
                     startActivity(intent);
                 }
             });
+
+            holder.setIsRecyclable(false);
         }
 
         @Override
@@ -555,6 +568,13 @@ public class MainActivity extends BaseActivity
             }
             if (currencyRates.contains(rate)) {
                 currencyRates.remove(position);
+                currencyRatesHistory.remove(position);
+
+                selectedCurrencies.remove(rate.getName());
+
+                editor.putBoolean(rate.getName(), false);
+                editor.apply();
+
                 notifyItemRemoved(position);
             }
         }

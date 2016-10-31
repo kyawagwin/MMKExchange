@@ -27,7 +27,10 @@ import com.passioncreativestudio.mmkexchange.CurrencyRate;
 import com.passioncreativestudio.mmkexchange.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 
 public class CurrencyListActivity extends BaseActivity {
     private RecyclerView curListRV;
@@ -107,11 +110,18 @@ public class CurrencyListActivity extends BaseActivity {
 
     private class CurrenciesAdapter extends RecyclerView.Adapter<CurrencyViewHolder> {
         private HashMap<String, Currency> currenciesMap;
-        private String[] keys;
+        private List<String> keys;
 
         public CurrenciesAdapter(HashMap<String, Currency> currenciesMap) {
             this.currenciesMap = currenciesMap;
-            this.keys = this.currenciesMap.keySet().toArray(new String[currenciesMap.size()]);
+
+            this.keys = new ArrayList<String>(currenciesMap.keySet());
+            Collections.sort(keys, new Comparator<String>() {
+                @Override
+                public int compare(String cr1, String cr2) {
+                    return cr1.compareTo(cr2);
+                }
+            });
         }
 
         @Override
@@ -123,7 +133,7 @@ public class CurrencyListActivity extends BaseActivity {
 
         @Override
         public void onBindViewHolder(CurrencyViewHolder holder, int position) {
-            Currency cur = currenciesMap.get(keys[position]);
+            Currency cur = currenciesMap.get(keys.get(position));
 
             int thumbId = getResources().getIdentifier(cur.getName().toLowerCase(), "drawable", getPackageName());
             holder.flagIV.setImageResource(thumbId);
@@ -135,12 +145,32 @@ public class CurrencyListActivity extends BaseActivity {
             else
                 holder.isSelectedIV.setVisibility(View.GONE);
 
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ImageView isSelectedIV = (ImageView) view.findViewById(R.id.list_item_currency_isSelectedIV);
+                    TextView curTV = (TextView) view.findViewById(R.id.list_item_currency_curName);
+                    String curName = curTV.getText().toString();
+                    if(isSelectedIV.getVisibility() != View.VISIBLE) {
+                        selectedCurrencies.add(curName);
+                        isSelectedIV.setVisibility(View.VISIBLE);
+                        editor.putBoolean(curName, true);
+                        editor.apply();
+                    } else {
+                        selectedCurrencies.remove(curName);
+                        isSelectedIV.setVisibility(View.GONE);
+                        editor.putBoolean(curName, false);
+                        editor.apply();
+                    }
+                }
+            });
+
             holder.setIsRecyclable(false);
         }
 
         @Override
         public int getItemCount() {
-            return keys.length;
+            return keys.size();
         }
     }
 
@@ -157,26 +187,6 @@ public class CurrencyListActivity extends BaseActivity {
             curName = (TextView) itemView.findViewById(R.id.list_item_currency_curName);
             curDescription = (TextView) itemView.findViewById(R.id.list_item_currency_curDescription);
             isSelectedIV = (ImageView) itemView.findViewById(R.id.list_item_currency_isSelectedIV);
-
-
-
-
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ImageView isSelectedIV = (ImageView) view.findViewById(R.id.list_item_currency_isSelectedIV);
-                    TextView curTV = (TextView) view.findViewById(R.id.list_item_currency_curName);
-                    String curName = curTV.getText().toString();
-                    if(isSelectedIV.getVisibility() != View.VISIBLE) {
-                        isSelectedIV.setVisibility(View.VISIBLE);
-                        editor.putBoolean(curName, true);
-                    } else {
-                        isSelectedIV.setVisibility(View.GONE);
-                        editor.putBoolean(curName, false);
-                    }
-                }
-            });
         }
     }
 }

@@ -8,6 +8,7 @@
     app:cardCornerRadius="4dp">
 
     <RelativeLayout
+        android:background="?attr/selectableItemBackground"
         android:paddingBottom="6dp"
         android:paddingLeft="6dp"
         android:layout_width="match_parent"

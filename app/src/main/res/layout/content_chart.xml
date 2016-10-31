@@ -10,10 +10,91 @@
     tools:showIn="@layout/activity_chart">
 
     <RelativeLayout
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <android.support.v7.widget.CardView
+            android:id="@+id/content_chart_pair"
+            android:layout_margin="5dp"
+            android:elevation="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:textStyle="bold"
+                    android:text="Compare"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/content_chart_srcFlagIV"
+                        android:src="@drawable/mmk"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <EditText
+                        android:id="@+id/content_chart_srcValueET"
+                        android:gravity="end"
+                        android:textAlignment="textEnd"
+                        android:text="920.00"
+                        android:selectAllOnFocus="true"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:imeOptions="actionDone" />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:src="@drawable/ic_compare"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/content_chart_destFlagIV"
+                        android:src="@drawable/sgd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <EditText
+                        android:id="@+id/content_chart_destValueET"
+                        android:gravity="end"
+                        android:selectAllOnFocus="true"
+                        android:textAlignment="textEnd"
+                        android:text="1.00"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:imeOptions="actionDone"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_below="@id/content_chart_pair"
             android:id="@+id/content_chart_fiveDayChart"
             android:layout_margin="5dp"
             android:elevation="4dp"
