@@ -103,4 +103,6 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="remind_me_later">Remind me later</string>
+    <string name="no_thank_you">No, thank you.</string>
 </resources>

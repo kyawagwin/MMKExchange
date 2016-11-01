@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -53,8 +54,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 
-import static com.passioncreativestudio.mmkexchange.AppRater.APP_DOMAIN;
+import static com.passioncreativestudio.mmkexchange.Constants.APP_DOMAIN;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -65,12 +67,10 @@ public class MainActivity extends BaseActivity
     private ProgressDialog progressDialog;
 
     private DecimalFormat curRateFormat = new DecimalFormat("0.00");
-    private static String apiUrl = "http://mmk-exchange.herokuapp.com/api/latest";
     private static String apiHistoryUrl = "http://mmk-exchange.herokuapp.com/api/history?date=";
-    SimpleDateFormat rateDatetimeFormat = new SimpleDateFormat("dd MMM yyyy hh:mm:ss a");
-    SimpleDateFormat historyDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    SimpleDateFormat rateDatetimeFormat = new SimpleDateFormat("dd MMM yyyy hh:mm:ss a", Locale.getDefault());
+    SimpleDateFormat historyDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
-    private Rate historyRate;
     private HashMap<String, Currency> currenciesMap;
     private ArrayList<String> selectedCurrencies;
     private ArrayList<CurrencyRate> currencyRates;
@@ -78,8 +78,6 @@ public class MainActivity extends BaseActivity
     private Date rateDate;
 
     private RatesAdapter adapter;
-
-    StringBuilder sb = new StringBuilder();
 
     private View rootView;
     private RecyclerView curRateRV;
@@ -201,7 +199,7 @@ public class MainActivity extends BaseActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
@@ -379,6 +377,7 @@ public class MainActivity extends BaseActivity
         protected Void doInBackground(Void... params) {
             Gson gson = new Gson();
             HttpHandler handler = new HttpHandler();
+            String apiUrl = "http://mmk-exchange.herokuapp.com/api/latest";
             String jsonStr = handler.makeServiceCall(apiUrl, "GET");
             if(jsonStr != null) {
                 try {
@@ -390,7 +389,6 @@ public class MainActivity extends BaseActivity
                         if(selectedCurrencies.contains(field.getName())) {
                             Double value = (Double) field.get(rate);
                             if (value != null) {
-                                sb.append(field.getName() + "=" + value);
 
                                 Currency cur = currenciesMap.get(field.getName());
 
@@ -413,7 +411,7 @@ public class MainActivity extends BaseActivity
                 try {
                     currencyRatesHistory.clear();
 
-                    historyRate = gson.fromJson(jsonStr, Rate.class);
+                    Rate historyRate = gson.fromJson(jsonStr, Rate.class);
                     for (Field field : historyRate.getClass().getDeclaredFields()) {
                         field.setAccessible(true); // You might want to set modifier to public first.
                         if(selectedCurrencies.contains(field.getName())) {
@@ -470,7 +468,7 @@ public class MainActivity extends BaseActivity
         private Handler handler = new Handler(); // hanlder for running delayed runnables
         HashMap<CurrencyRate, Runnable> pendingRunnables = new HashMap<>(); // map of items to pending runnables, so we can cancel a removal if need be
 
-        public RatesAdapter(ArrayList<CurrencyRate> currencyRates) {
+        RatesAdapter(ArrayList<CurrencyRate> currencyRates) {
             this.currencyRates = currencyRates;
             Collections.sort(currencyRates, new Comparator<CurrencyRate>() {
                 @Override
@@ -539,11 +537,11 @@ public class MainActivity extends BaseActivity
             this.undoOn = undoOn;
         }
 
-        public boolean isUndoOn() {
+        boolean isUndoOn() {
             return undoOn;
         }
 
-        public void pendingRemoval(int position) {
+        void pendingRemoval(int position) {
             final CurrencyRate rate = currencyRates.get(position);
             if (!currencyRatesPendingRemoval.contains(rate)) {
                 currencyRatesPendingRemoval.add(rate);
@@ -561,7 +559,7 @@ public class MainActivity extends BaseActivity
             }
         }
 
-        public void remove(int position) {
+        void remove(int position) {
             CurrencyRate rate = currencyRates.get(position);
             if (currencyRatesPendingRemoval.contains(rate)) {
                 currencyRatesPendingRemoval.remove(rate);
@@ -579,7 +577,7 @@ public class MainActivity extends BaseActivity
             }
         }
 
-        public boolean isPendingRemoval(int position) {
+        boolean isPendingRemoval(int position) {
             CurrencyRate rate = currencyRates.get(position);
             return currencyRates.contains(rate);
         }
@@ -592,7 +590,7 @@ public class MainActivity extends BaseActivity
         TextView rateDescription;
         ImageView rateStatusIV;
 
-        public RateViewHolder(View view) {
+        RateViewHolder(View view) {
             super(view);
 
             rateThumbnail = (ImageView) view.findViewById(R.id.list_item_rate_thumbnail);

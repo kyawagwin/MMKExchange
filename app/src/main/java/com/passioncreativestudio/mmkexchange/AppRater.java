@@ -1,7 +1,6 @@
 package com.passioncreativestudio.mmkexchange;
 
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,32 +10,30 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import static com.passioncreativestudio.mmkexchange.Constants.APP_DOMAIN;
+import static com.passioncreativestudio.mmkexchange.Constants.APP_TITLE;
+import static com.passioncreativestudio.mmkexchange.Constants.DAYS_UNTIL_PROMPT;
+import static com.passioncreativestudio.mmkexchange.Constants.KEY_SHARED_PREFS_APP_RATER;
+import static com.passioncreativestudio.mmkexchange.Constants.KEY_SHARED_PREFS_DATE_FIRST_LAUNCH;
+import static com.passioncreativestudio.mmkexchange.Constants.KEY_SHARED_PREFS_DONT_SHOW_AGAIN;
+import static com.passioncreativestudio.mmkexchange.Constants.KEY_SHARED_PREFS_LAUNCH_COUNT;
+import static com.passioncreativestudio.mmkexchange.Constants.LAUNCHES_UNTIL_PROMPT;
+
 public class AppRater {
-    private static final String KEY_APP_RATER = "APP_RATER";
-    private static final String KEY_DONT_SHOW_AGAIN = "DONT_SHOW_AGAIN";
-    private static final String KEY_LAUNCH_COUNT = "LAUNCH_COUNT";
-    private static final String KEY_DATE_FIRST_LAUNCH = "DATE_FIRST_LAUNCH";
-
-    public final static String APP_TITLE = "MMK Exchange";
-    public final static String APP_DOMAIN = "com.passioncreativestudio.mmkexchange";
-
-    private final static int DAYS_UNTIL_PROMPT = 3;
-    private final static int LAUNCHES_UNTIL_PROMPT = 3;
-
     public static void appLaunched(Context context) {
-        SharedPreferences preferences = context.getSharedPreferences(KEY_APP_RATER, 0);
-        if(preferences.getBoolean(KEY_DONT_SHOW_AGAIN, false))
+        SharedPreferences preferences = context.getSharedPreferences(KEY_SHARED_PREFS_APP_RATER, 0);
+        if(preferences.getBoolean(KEY_SHARED_PREFS_DONT_SHOW_AGAIN, false))
             return;
 
         SharedPreferences.Editor editor = preferences.edit();
 
-        long launchCount = preferences.getLong(KEY_LAUNCH_COUNT, 0) + 1;
-        editor.putLong(KEY_LAUNCH_COUNT, launchCount);
+        long launchCount = preferences.getLong(KEY_SHARED_PREFS_LAUNCH_COUNT, 0) + 1;
+        editor.putLong(KEY_SHARED_PREFS_LAUNCH_COUNT, launchCount);
 
-        long dateFirstLaunch = preferences.getLong(KEY_DATE_FIRST_LAUNCH, 0);
+        long dateFirstLaunch = preferences.getLong(KEY_SHARED_PREFS_DATE_FIRST_LAUNCH, 0);
         if(dateFirstLaunch == 0) {
             dateFirstLaunch = System.currentTimeMillis();
-            editor.putLong(KEY_DATE_FIRST_LAUNCH, dateFirstLaunch);
+            editor.putLong(KEY_SHARED_PREFS_DATE_FIRST_LAUNCH, dateFirstLaunch);
         }
 
         if(launchCount >= LAUNCHES_UNTIL_PROMPT) {
@@ -63,7 +60,7 @@ public class AppRater {
         linearLayout.addView(textView);
 
         Button rateButton = new Button(context);
-        rateButton.setText("Rate " + APP_TITLE);
+        rateButton.setText(String.format("Rate %s", APP_TITLE));
         rateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,13 +71,13 @@ public class AppRater {
         linearLayout.addView(rateButton);
 
         Button laterButton = new Button(context);
-        laterButton.setText("Remind me later");
+        laterButton.setText(R.string.remind_me_later);
         laterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // reset the counter to pop up rate again
-                editor.putLong(KEY_DATE_FIRST_LAUNCH, System.currentTimeMillis());
-                editor.putLong(KEY_LAUNCH_COUNT, 0);
+                editor.putLong(KEY_SHARED_PREFS_DATE_FIRST_LAUNCH, System.currentTimeMillis());
+                editor.putLong(KEY_SHARED_PREFS_LAUNCH_COUNT, 0);
 
                 dialog.dismiss();
             }
@@ -88,12 +85,12 @@ public class AppRater {
         linearLayout.addView(laterButton);
 
         Button noButton = new Button(context);
-        noButton.setText("No, thank you.");
+        noButton.setText(R.string.no_thank_you);
         noButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(editor != null) {
-                    editor.putBoolean(KEY_DONT_SHOW_AGAIN, true);
+                    editor.putBoolean(KEY_SHARED_PREFS_DONT_SHOW_AGAIN, true);
                     editor.commit();
                 }
 
