@@ -43,7 +43,7 @@ import com.passioncreativestudio.mmkexchange.Currency;
 import com.passioncreativestudio.mmkexchange.CurrencyRate;
 import com.passioncreativestudio.mmkexchange.HttpHandler;
 import com.passioncreativestudio.mmkexchange.R;
-import com.passioncreativestudio.mmkexchange.Rate;
+import com.passioncreativestudio.mmkexchange.localbank.Rate;
 
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
@@ -205,6 +205,8 @@ public class MainActivity extends BaseActivity
 
         if (id == R.id.nav_rate) {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + APP_DOMAIN)));
+        } else if(id == R.id.nav_localBanks) {
+            startActivity(new Intent(this, LocalBankActivity.class));
         }
 
         /*

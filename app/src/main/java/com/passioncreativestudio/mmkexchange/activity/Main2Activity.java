@@ -39,7 +39,7 @@ import com.passioncreativestudio.mmkexchange.Currency;
 import com.passioncreativestudio.mmkexchange.CurrencyRate;
 import com.passioncreativestudio.mmkexchange.HttpHandler;
 import com.passioncreativestudio.mmkexchange.R;
-import com.passioncreativestudio.mmkexchange.Rate;
+import com.passioncreativestudio.mmkexchange.localbank.Rate;
 
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;

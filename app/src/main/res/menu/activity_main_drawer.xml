@@ -3,6 +3,14 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/nav_main"
+            android:icon="@drawable/ic_action_main"
+            android:title="Get Latest Rates" />
+        <item
+            android:id="@+id/nav_localBanks"
+            android:icon="@drawable/ic_action_localbanks"
+            android:title="Local Banks Rate" />
+        <item
             android:id="@+id/nav_rate"
             android:icon="@drawable/ic_action_rate"
             android:title="Rate this app" />

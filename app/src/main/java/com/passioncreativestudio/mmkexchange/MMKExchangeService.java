@@ -6,5 +6,5 @@ import retrofit2.http.Path;
 
 public interface MMKExchangeService {
     @GET("history/?date={date}")
-    Call<Rate> historyRate(@Path("date") String date);
+    Call<com.passioncreativestudio.mmkexchange.localbank.Rate> historyRate(@Path("date") String date);
 }

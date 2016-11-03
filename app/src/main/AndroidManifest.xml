@@ -31,6 +31,8 @@
             android:name=".activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <activity android:name=".activity.LocalBankActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activity.WelcomeActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
